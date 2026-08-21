@@ -1,49 +1,318 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --pink: #f5c6cb;
+  --pink-light: #fce4e6;
+  --pink-dark: #d49b9f;
+  --white: #ffffff;
+  --shadow: 0 10px 25px -8px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: #fef9f7;
+  color: #3d2c2a;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* ============================================
+   CONTAINER - FULLY RESPONSIVE
+   ============================================ */
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS - SIMPLIFIED
+   ============================================ */
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+  .container {
+    padding: 0 40px;
   }
 }
 
-html {
-  height: 100%;
+/* Desktop */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .container {
+    padding: 0 32px;
+  }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
+/* Tablet */
+@media (min-width: 768px) and (max-width: 991px) {
+  .container {
+    padding: 0 24px;
+  }
   html {
-    color-scheme: dark;
+    font-size: 15px;
+  }
+}
+
+/* Mobile - ALL phones */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 16px !important;
+  }
+  html {
+    font-size: 14px;
+  }
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px !important;
+  }
+  html {
+    font-size: 13px;
+  }
+  body {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   PREVENT HORIZONTAL SCROLL - CRITICAL FIX
+   ============================================ */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Force all elements to not overflow */
+* {
+  max-width: 100%;
+}
+
+/* ============================================
+   TOUCH & INTERACTION IMPROVEMENTS
+   ============================================ */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+
+/* Even larger touch targets on mobile */
+@media (max-width: 768px) {
+  button, a, input, select, textarea {
+    min-height: 48px;
+  }
+}
+
+/* Better mobile scrolling */
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent iOS zoom on form elements */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* ============================================
+   IMAGES - FULLY RESPONSIVE
+   ============================================ */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================
+   SCROLLBAR - Clean on all devices
+   ============================================ */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d49b9f;
+  border-radius: 10px;
+}
+
+/* Desktop: slightly bigger scrollbar */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fef9f7;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #fce4e6, #d49b9f);
+    border: 2px solid #fef9f7;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #d49b9f, #c4848a);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d49b9f #fef9f7;
+  }
+}
+
+/* ============================================
+   SELECTION STYLES
+   ============================================ */
+::selection {
+  background: rgba(212, 155, 159, 0.3);
+  color: #3d2c2a;
+}
+
+::-moz-selection {
+  background: rgba(212, 155, 159, 0.3);
+  color: #3d2c2a;
+}
+
+/* ============================================
+   BUTTON & LINK HOVERS (Desktop only)
+   ============================================ */
+@media (hover: hover) {
+  button:hover, a:hover {
+    transition: all 0.3s ease;
+  }
+}
+
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+.product-card {
+  transition: all 0.3s ease;
+}
+
+@media (hover: hover) {
+  .product-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(212, 155, 159, 0.2);
+  }
+}
+
+@media (hover: none) {
+  .product-card:hover {
+    transform: none !important;
+    box-shadow: 0 4px 15px rgba(210, 160, 160, 0.08) !important;
+  }
+}
+
+/* ============================================
+   GRADIENT TEXT UTILITY
+   ============================================ */
+.gradient-text {
+  background: linear-gradient(135deg, #d49b9f, #f5c6cb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   SPARKLE ANIMATION
+   ============================================ */
+@keyframes sparkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.sparkle {
+  animation: sparkle 2s infinite;
+}
+
+/* ============================================
+   BACKGROUND PATTERNS
+   ============================================ */
+.bg-cute-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(245, 198, 203, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(212, 155, 159, 0.03) 0%, transparent 50%);
+}
+
+/* ============================================
+   SHIMMER EFFECT
+   ============================================ */
+.shimmer {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 200%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ============================================
+   FADE IN ANIMATION
+   ============================================ */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* ============================================
+   FADE UP ANIMATION (for modals)
+   ============================================ */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: scale(0.95) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.3s ease-out forwards;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+
+@media (max-width: 767px) {
+  .text-center-mobile {
+    text-align: center !important;
+  }
+  .text-left-mobile {
+    text-align: left !important;
+  }
+  .text-right-mobile {
+    text-align: right !important;
   }
 }
