@@ -62,6 +62,7 @@ export default function ProductCard({ product }) {
 
       <button
         type="button"
+        className="add-to-cart-btn"
         onClick={(e) => {
           e.stopPropagation()
           e.preventDefault()
@@ -83,12 +84,17 @@ export default function ProductCard({ product }) {
           fontSize: '0.9rem',
           width: '100%',
           justifyContent: 'center',
+          transition: 'background 0.2s ease, color 0.2s ease',
         }}
       >
         <span aria-hidden="true">🛒</span> Add to Cart
       </button>
 
       <style jsx>{`
+        .add-to-cart-btn:hover {
+          background: #a34d54 !important;
+          color: white !important;
+        }
         @media (max-width: 480px) {
           div {
             padding: 12px 10px 14px !important;

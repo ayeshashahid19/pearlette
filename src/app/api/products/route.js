@@ -1,5 +1,6 @@
 import { getProducts, serializeProduct } from '../../../lib/products.js'
 import { prisma } from '../../../lib/prisma.js'
+import { getAdminSession } from '../../../lib/auth.js'
 import { parseProductListQuery, validateProductInput, ValidationError } from '../../../lib/validation.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../lib/api-error.js'
 
@@ -7,6 +8,14 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
     const query = parseProductListQuery(searchParams)
+
+    if (query.includeInactive) {
+      const session = await getAdminSession()
+      if (!session) {
+        return jsonError('Authentication required.', 401)
+      }
+    }
+
     const products = await getProducts(query)
     return jsonSuccess({ products })
   } catch (error) {
@@ -18,6 +27,12 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const session = await getAdminSession()
+
+  if (!session) {
+    return jsonError('Authentication required.', 401)
+  }
+
   try {
     const body = await request.json()
     const data = validateProductInput(body)

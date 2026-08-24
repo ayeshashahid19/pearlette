@@ -2,10 +2,13 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useCart } from '../context/CartContext'
+import { isValidPakistaniPhone } from '../../lib/validation.js'
+
+const FIELD_ORDER = ['name', 'email', 'address', 'city', 'phone']
 
 export default function CartPage() {
   const router = useRouter()
@@ -29,6 +32,9 @@ export default function CartPage() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
+  const fieldRefs = useRef({})
+  const formRef = useRef(null)
 
   const subtotal = getSubtotal()
 
@@ -38,6 +44,44 @@ export default function CartPage() {
       [e.target.name]: e.target.value,
     })
     if (formError) setFormError('')
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors((prev) => ({ ...prev, [e.target.name]: '' }))
+    }
+  }
+
+  const validateFields = () => {
+    const errors = {}
+
+    if (!deliveryDetails.name.trim()) {
+      errors.name = 'Full name is required.'
+    }
+
+    if (!isValidPakistaniPhone(deliveryDetails.phone)) {
+      errors.phone = 'Enter a valid Pakistani phone number (e.g., 03001234567).'
+    }
+
+    if (!deliveryDetails.address.trim()) {
+      errors.address = 'Delivery address is required.'
+    }
+
+    if (!deliveryDetails.city.trim()) {
+      errors.city = 'City is required.'
+    }
+
+    const email = deliveryDetails.email.trim()
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Email address is invalid.'
+    }
+
+    return errors
+  }
+
+  const scrollToFirstError = (errors) => {
+    const firstKey = FIELD_ORDER.find((key) => errors[key])
+    if (firstKey) {
+      fieldRefs.current[firstKey]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      fieldRefs.current[firstKey]?.focus?.()
+    }
   }
 
   const handlePlaceOrder = async (e) => {
@@ -48,8 +92,17 @@ export default function CartPage() {
       return
     }
 
+    const errors = validateFields()
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setFormError('Please fix the highlighted fields below.')
+      scrollToFirstError(errors)
+      return
+    }
+
     setSubmitting(true)
     setFormError('')
+    setFieldErrors({})
 
     try {
       const response = await fetch('/api/orders', {
@@ -79,6 +132,7 @@ export default function CartPage() {
       router.push(`/cart/success?orderId=${data.order.id}`)
     } catch (error) {
       setFormError(error.message)
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     } finally {
       setSubmitting(false)
     }
@@ -112,24 +166,26 @@ export default function CartPage() {
           <h1 style={{ fontSize: '2.5rem', color: '#3d2c2a', fontWeight: '600', margin: 0 }}>
             Your Cart
           </h1>
-          {items.length > 0 && (
-            <button
-              type="button"
-              onClick={clearCart}
-              style={{
-                background: 'transparent',
-                border: '1px solid #f0dbd9',
-                color: '#5f4a47',
-                padding: '10px 18px',
-                borderRadius: '999px',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontWeight: '500',
-              }}
-            >
-              Clear cart
-            </button>
-          )}
+            {items.length > 0 && (
+              <button
+                type="button"
+                onClick={clearCart}
+                className="btn-ghost-pink"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #f0dbd9',
+                  color: '#5f4a47',
+                  padding: '10px 18px',
+                  borderRadius: '999px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  fontWeight: '500',
+                  transition: 'color 0.2s ease, border-color 0.2s ease',
+                }}
+              >
+                Clear cart
+              </button>
+            )}
         </div>
 
         <div
@@ -153,6 +209,7 @@ export default function CartPage() {
                 <p style={{ fontSize: '1.2rem', color: '#5f4a47' }}>Your cart is empty</p>
                 <Link
                   href="/"
+                  className="btn-solid-pink"
                   style={{
                     display: 'inline-block',
                     marginTop: '20px',
@@ -231,6 +288,7 @@ export default function CartPage() {
                           type="button"
                           aria-label={`Decrease quantity of ${item.name}`}
                           onClick={() => decrementItem(item.productId)}
+                          className="qty-btn"
                           style={qtyButtonStyle}
                         >
                           −
@@ -242,6 +300,7 @@ export default function CartPage() {
                           type="button"
                           aria-label={`Increase quantity of ${item.name}`}
                           onClick={() => incrementItem(item.productId)}
+                          className="qty-btn"
                           style={qtyButtonStyle}
                         >
                           +
@@ -300,7 +359,7 @@ export default function CartPage() {
                     <span style={{ color: '#d49b9f' }}>Rs. {subtotal.toLocaleString()}</span>
                   </div>
                   <p style={{ color: '#5f4a47', fontSize: '0.85rem', marginTop: '10px' }}>
-                    Free shipping · Cash on Delivery
+                    Shipping Rs. 280 · Cash on Delivery
                   </p>
                 </div>
               </div>
@@ -323,7 +382,7 @@ export default function CartPage() {
               Please fill in your delivery information. We offer Cash on Delivery nationwide.
             </p>
 
-            <form onSubmit={handlePlaceOrder}>
+            <form onSubmit={handlePlaceOrder} noValidate ref={formRef}>
               {formError && (
                 <div
                   role="alert"
@@ -348,10 +407,15 @@ export default function CartPage() {
                   name="name"
                   value={deliveryDetails.name}
                   onChange={handleInputChange}
-                  required
-                  style={inputStyle}
+                  ref={(el) => { fieldRefs.current.name = el }}
+                  style={{ ...inputStyle, borderColor: fieldErrors.name ? '#e08a8a' : '#f0dbd9' }}
                   placeholder="Enter your full name"
                 />
+                {fieldErrors.name && (
+                  <p role="alert" style={{ color: '#8a2f2f', fontSize: '0.82rem', margin: '5px 0 0' }}>
+                    {fieldErrors.name}
+                  </p>
+                )}
               </div>
 
               <div style={{ marginBottom: '18px' }}>
@@ -361,9 +425,15 @@ export default function CartPage() {
                   name="email"
                   value={deliveryDetails.email}
                   onChange={handleInputChange}
-                  style={inputStyle}
+                  ref={(el) => { fieldRefs.current.email = el }}
+                  style={{ ...inputStyle, borderColor: fieldErrors.email ? '#e08a8a' : '#f0dbd9' }}
                   placeholder="your@email.com (optional)"
                 />
+                {fieldErrors.email && (
+                  <p role="alert" style={{ color: '#8a2f2f', fontSize: '0.82rem', margin: '5px 0 0' }}>
+                    {fieldErrors.email}
+                  </p>
+                )}
               </div>
 
               <div style={{ marginBottom: '18px' }}>
@@ -373,10 +443,15 @@ export default function CartPage() {
                   name="address"
                   value={deliveryDetails.address}
                   onChange={handleInputChange}
-                  required
-                  style={inputStyle}
+                  ref={(el) => { fieldRefs.current.address = el }}
+                  style={{ ...inputStyle, borderColor: fieldErrors.address ? '#e08a8a' : '#f0dbd9' }}
                   placeholder="House #, Street, Area"
                 />
+                {fieldErrors.address && (
+                  <p role="alert" style={{ color: '#8a2f2f', fontSize: '0.82rem', margin: '5px 0 0' }}>
+                    {fieldErrors.address}
+                  </p>
+                )}
               </div>
 
               <div style={{ marginBottom: '18px' }}>
@@ -386,10 +461,15 @@ export default function CartPage() {
                   name="city"
                   value={deliveryDetails.city}
                   onChange={handleInputChange}
-                  required
-                  style={inputStyle}
+                  ref={(el) => { fieldRefs.current.city = el }}
+                  style={{ ...inputStyle, borderColor: fieldErrors.city ? '#e08a8a' : '#f0dbd9' }}
                   placeholder="Enter your city"
                 />
+                {fieldErrors.city && (
+                  <p role="alert" style={{ color: '#8a2f2f', fontSize: '0.82rem', margin: '5px 0 0' }}>
+                    {fieldErrors.city}
+                  </p>
+                )}
               </div>
 
               <div style={{ marginBottom: '18px' }}>
@@ -399,10 +479,15 @@ export default function CartPage() {
                   name="phone"
                   value={deliveryDetails.phone}
                   onChange={handleInputChange}
-                  required
-                  style={inputStyle}
+                  ref={(el) => { fieldRefs.current.phone = el }}
+                  style={{ ...inputStyle, borderColor: fieldErrors.phone ? '#e08a8a' : '#f0dbd9' }}
                   placeholder="03XX-XXXXXXX"
                 />
+                {fieldErrors.phone && (
+                  <p role="alert" style={{ color: '#8a2f2f', fontSize: '0.82rem', margin: '5px 0 0' }}>
+                    {fieldErrors.phone}
+                  </p>
+                )}
               </div>
 
               <div style={{ marginBottom: '25px' }}>
@@ -420,6 +505,7 @@ export default function CartPage() {
               <button
                 type="submit"
                 disabled={items.length === 0 || submitting}
+                className="btn-solid-pink"
                 style={{
                   width: '100%',
                   padding: '16px',
@@ -442,6 +528,18 @@ export default function CartPage() {
       <Footer />
 
       <style jsx global>{`
+        .btn-solid-pink:hover:not(:disabled) {
+          background: #a34d54 !important;
+          color: white !important;
+        }
+        .btn-ghost-pink:hover {
+          color: #a34d54 !important;
+          border-color: #a34d54 !important;
+        }
+        .qty-btn:hover {
+          border-color: #a34d54 !important;
+          color: #a34d54 !important;
+        }
         @media (max-width: 900px) {
           .cart-layout {
             grid-template-columns: 1fr !important;

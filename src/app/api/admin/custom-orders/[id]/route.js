@@ -1,9 +1,13 @@
 import { prisma } from '../../../../../lib/prisma.js'
 import { serializeCustomOrder } from '../../../../../lib/custom-orders.js'
+import { requireAdmin } from '../../../../../lib/auth.js'
 import { validateCustomOrderStatus, ValidationError } from '../../../../../lib/validation.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../../../lib/api-error.js'
 
 export async function GET(request, { params }) {
+  const { errorResponse } = await requireAdmin()
+  if (errorResponse) return errorResponse
+
   try {
     const { id } = await params
 
@@ -22,6 +26,9 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+  const { errorResponse } = await requireAdmin()
+  if (errorResponse) return errorResponse
+
   try {
     const { id } = await params
     const body = await request.json()

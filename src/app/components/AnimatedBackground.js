@@ -23,6 +23,7 @@ const AnimatedBackground = () => {
         floatType: Math.floor(Math.random() * 2),
       });
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setElements(newElements);
   }, []);
 

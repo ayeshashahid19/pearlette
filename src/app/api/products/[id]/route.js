@@ -1,5 +1,6 @@
 import { getProductById, serializeProduct } from '../../../../lib/products.js'
 import { prisma } from '../../../../lib/prisma.js'
+import { getAdminSession } from '../../../../lib/auth.js'
 import { validateProductInput, ValidationError } from '../../../../lib/validation.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../../lib/api-error.js'
 
@@ -8,6 +9,13 @@ export async function GET(request, { params }) {
     const { id } = await params
     const { searchParams } = new URL(request.url)
     const includeInactive = searchParams.get('includeInactive') === 'true'
+
+    if (includeInactive) {
+      const session = await getAdminSession()
+      if (!session) {
+        return jsonError('Authentication required.', 401)
+      }
+    }
 
     const product = await getProductById(id, { includeInactive })
     if (!product) {
@@ -21,6 +29,12 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
+  const session = await getAdminSession()
+
+  if (!session) {
+    return jsonError('Authentication required.', 401)
+  }
+
   try {
     const { id } = await params
     const body = await request.json()
@@ -46,6 +60,12 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  const session = await getAdminSession()
+
+  if (!session) {
+    return jsonError('Authentication required.', 401)
+  }
+
   try {
     const { id } = await params
 

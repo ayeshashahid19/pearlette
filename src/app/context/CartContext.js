@@ -50,7 +50,9 @@ export function CartProvider({ children }) {
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(loadStoredCart())
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsHydrated(true)
   }, [])
 

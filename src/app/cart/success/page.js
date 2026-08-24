@@ -15,6 +15,7 @@ function OrderSuccessContent() {
 
   useEffect(() => {
     if (!orderId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError('No order ID provided.')
       setLoading(false)
       return
@@ -50,7 +51,7 @@ function OrderSuccessContent() {
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ color: '#3d2c2a', marginBottom: '12px' }}>Confirmation unavailable</h1>
             <p style={{ color: '#5f4a47', marginBottom: '24px' }}>{error}</p>
-            <Link href="/" style={primaryLinkStyle}>
+            <Link href="/" className="btn-solid-pink" style={primaryLinkStyle}>
               Back to shop
             </Link>
           </div>
@@ -139,13 +140,19 @@ function OrderSuccessContent() {
               anything, we will contact you using the phone number provided at checkout.
             </p>
 
-            <Link href="/" style={primaryLinkStyle}>
+            <Link href="/" className="btn-solid-pink" style={primaryLinkStyle}>
               Continue Shopping
             </Link>
           </div>
         )}
       </main>
       <Footer />
+      <style jsx global>{`
+        .btn-solid-pink:hover {
+          background: #a34d54 !important;
+          color: white !important;
+        }
+      `}</style>
     </div>
   )
 }

@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
               </div>
               <div>
                 <dt style={{ fontWeight: '600', display: 'inline' }}>Shipping: </dt>
-                <dd style={{ display: 'inline' }}>Free nationwide · Cash on Delivery</dd>
+                <dd style={{ display: 'inline' }}>Rs. 280 nationwide · Cash on Delivery</dd>
               </div>
             </dl>
 
@@ -105,6 +105,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                 <button
                   type="button"
                   aria-label="Decrease quantity"
+                  className="qty-btn"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   style={qtyButtonStyle}
                 >
@@ -116,6 +117,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                 <button
                   type="button"
                   aria-label="Increase quantity"
+                  className="qty-btn"
                   onClick={() => setQuantity((q) => q + 1)}
                   style={qtyButtonStyle}
                 >
@@ -124,7 +126,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
               </div>
             </div>
 
-            <button type="button" onClick={handleAddToCart} style={addButtonStyle}>
+            <button type="button" className="add-to-cart-btn" onClick={handleAddToCart} style={addButtonStyle}>
               Add to Cart
             </button>
 
@@ -138,7 +140,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                 color: '#3d2c2a',
               }}
             >
-              Cash on Delivery available nationwide · Free shipping
+              Cash on Delivery available nationwide · Shipping Rs. 280
             </div>
           </div>
         </article>
@@ -166,6 +168,13 @@ export default function ProductDetailClient({ product, relatedProducts }) {
       <Footer />
 
       <style jsx global>{`
+        .add-to-cart-btn:hover {
+          background: #a34d54 !important;
+        }
+        .qty-btn:hover {
+          border-color: #a34d54 !important;
+          color: #a34d54 !important;
+        }
         @media (max-width: 768px) {
           .product-detail-grid {
             grid-template-columns: 1fr !important;

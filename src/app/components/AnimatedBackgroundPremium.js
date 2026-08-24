@@ -57,6 +57,7 @@ const AnimatedBackgroundPremium = () => {
       })
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setElements([...largeElements, ...mediumElements, ...smallElements])
 
     // Create floating hearts that form shapes occasionally
@@ -75,6 +76,7 @@ const AnimatedBackgroundPremium = () => {
         type: 'heart'
       })
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSparkles(heartElements)
 
   }, [])

@@ -1,11 +1,28 @@
 'use client'
 
 import Link from 'next/link'
+import { Gem, Heart } from 'lucide-react'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import HomeFeatured from './HomeFeatured'
 
-export default function HomePage({ featuredProducts = [] }) {
+export default function HomePage({ featuredProducts = [], brandVideoUrl = null, brandVideoPoster = null }) {
+  const statValueStyle = {
+    fontSize: '2rem',
+    color: '#d49b9f',
+    fontWeight: '600',
+    lineHeight: 1,
+    height: '2.4rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: '6px',
+  }
+  const statLabelStyle = {
+    color: '#5f4a47',
+    fontSize: '0.9rem',
+  }
+
   return (
     <div>
       <Navbar />
@@ -56,6 +73,7 @@ export default function HomePage({ featuredProducts = [] }) {
                   fontWeight: '500',
                   backdropFilter: 'blur(10px)',
                 }}
+                className="hero-badge"
               >
                 Handcrafted with Love
               </div>
@@ -95,6 +113,7 @@ export default function HomePage({ featuredProducts = [] }) {
               >
                 <Link
                   href="/necklace"
+                  className="btn-solid-pink"
                   style={{
                     background: '#d49b9f',
                     color: 'white',
@@ -107,12 +126,14 @@ export default function HomePage({ featuredProducts = [] }) {
                     flex: '1 1 auto',
                     minWidth: '140px',
                     textAlign: 'center',
+                    transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
                   }}
                 >
                   Explore Collection →
                 </Link>
                 <Link
                   href="/custom"
+                  className="btn-outline-pink"
                   style={{
                     background: 'white',
                     color: '#3d2c2a',
@@ -126,6 +147,7 @@ export default function HomePage({ featuredProducts = [] }) {
                     flex: '1 1 auto',
                     minWidth: '140px',
                     textAlign: 'center',
+                    transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
                   }}
                 >
                   Custom Order
@@ -151,7 +173,7 @@ export default function HomePage({ featuredProducts = [] }) {
                   borderRadius: '24px',
                   overflow: 'hidden',
                   boxShadow: '0 20px 40px rgba(212, 155, 159, 0.15)',
-                  aspectRatio: '16/9',
+                  aspectRatio: '4/3',
                   background: 'linear-gradient(135deg, #fce4e6, #f5c6cb)',
                   display: 'flex',
                   alignItems: 'center',
@@ -161,7 +183,28 @@ export default function HomePage({ featuredProducts = [] }) {
                   fontWeight: '500',
                 }}
               >
-                Brand media placeholder
+                {brandVideoUrl ? (
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    src={brandVideoUrl}
+                    poster={brandVideoPoster || undefined}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      display: 'block',
+                      background: '#3d2c2a',
+                    }}
+                  >
+                    Your browser does not support video playback.
+                  </video>
+                ) : (
+                  'Brand media placeholder'
+                )}
               </div>
             </div>
 
@@ -186,25 +229,34 @@ export default function HomePage({ featuredProducts = [] }) {
                 }}
               />
               <p style={{ fontSize: '1.05rem', color: '#5f4a47', lineHeight: '2', marginBottom: '20px' }}>
-                Every piece of Pearlette jewelry is a labor of love. I personally hand-select each material,
-                carefully craft every detail, and pour my heart into creating pieces that tell a story.
+                Pearlette is where your Pinterest inspos turn into reality.
+                <br />
+                A place for the pieces you saved, the styles you couldn’t stop thinking about and the
+                jewelry you wished you could actually wear.
+              </p>
+              <p style={{ fontSize: '1.05rem', color: '#5f4a47', lineHeight: '2', marginBottom: '20px' }}>
+                We take inspiration from the internet’s prettiest corners and turn it into wearable
+                little things you’ll want to keep forever.
               </p>
               <p style={{ fontSize: '1.05rem', color: '#5f4a47', lineHeight: '2', marginBottom: '30px' }}>
-                From the initial design sketch to the final polish, each piece is crafted with the same care
-                and attention I would give to a gift for someone I love. That is the Pearlette promise.
+                Because sometimes, your dream jewelry is just one idea away from becoming real.
               </p>
-              <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
                 <div>
-                  <div style={{ fontSize: '2rem', color: '#d49b9f', fontWeight: '600' }}>100%</div>
-                  <div style={{ color: '#5f4a47', fontSize: '0.9rem' }}>Handcrafted</div>
+                  <div style={statValueStyle}>100%</div>
+                  <div style={statLabelStyle}>Handcrafted</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '2rem', color: '#d49b9f', fontWeight: '600' }}>✨</div>
-                  <div style={{ color: '#5f4a47', fontSize: '0.9rem' }}>Premium Quality</div>
+                  <div style={{ ...statValueStyle }}>
+                    <Gem size={26} strokeWidth={1.75} aria-hidden="true" />
+                  </div>
+                  <div style={statLabelStyle}>Premium Quality</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '2rem', color: '#d49b9f', fontWeight: '600' }}>❤️</div>
-                  <div style={{ color: '#5f4a47', fontSize: '0.9rem' }}>Made with Love</div>
+                  <div style={{ ...statValueStyle }}>
+                    <Heart size={26} strokeWidth={1.75} aria-hidden="true" />
+                  </div>
+                  <div style={statLabelStyle}>Made with Love</div>
                 </div>
               </div>
             </div>
@@ -233,10 +285,11 @@ export default function HomePage({ featuredProducts = [] }) {
               }}
             >
               Have a unique vision? Share your inspiration and we will bring it to life. Custom pieces
-              typically take 7–14 days with a 50% advance to begin crafting.
+              typically take 3-5 days with a 50% advance to begin crafting.
             </p>
             <Link
               href="/custom"
+              className="btn-solid-pink"
               style={{
                 background: '#d49b9f',
                 color: 'white',
@@ -246,6 +299,7 @@ export default function HomePage({ featuredProducts = [] }) {
                 fontWeight: '600',
                 fontSize: '0.95rem',
                 display: 'inline-block',
+                transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
               }}
             >
               Start Your Custom Order
@@ -256,7 +310,15 @@ export default function HomePage({ featuredProducts = [] }) {
         <Footer />
       </main>
 
-      <style jsx>{`
+      <style jsx global>{`
+        .btn-solid-pink:hover {
+          background: #a34d54 !important;
+          color: white !important;
+        }
+        .btn-outline-pink:hover {
+          border-color: #a34d54 !important;
+          color: #a34d54 !important;
+        }
         .story-grid {
           grid-template-columns: 1fr 1fr !important;
           gap: 50px !important;
