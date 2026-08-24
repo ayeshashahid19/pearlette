@@ -13,7 +13,7 @@ export default function HomeFeatured({ products }) {
     >
       <div style={{ textAlign: 'center', marginBottom: '30px' }}>
         <h2 style={{ fontSize: '2rem', color: '#3d2c2a', fontWeight: '600' }}>
-          Featured <span style={{ color: '#d49b9f' }}>Collection</span>
+          Most Beloved <span style={{ color: '#d49b9f' }}>Pieces</span>
         </h2>
         <p style={{ color: '#5f4a47', fontSize: '0.95rem', marginTop: '8px' }}>
           Each piece tells a story of craftsmanship and love

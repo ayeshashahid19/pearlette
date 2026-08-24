@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
+import { Heart } from 'lucide-react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
@@ -65,8 +66,8 @@ function OrderSuccessContent() {
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: '3rem', marginBottom: '12px' }} aria-hidden="true">
-              ✨
+            <div style={{ marginBottom: '12px' }} aria-hidden="true">
+              <Heart size={48} strokeWidth={1.5} color="#d49b9f" fill="#f5c6cb" />
             </div>
             <h1 style={{ fontSize: '2rem', color: '#3d2c2a', marginBottom: '8px' }}>
               Order Confirmed

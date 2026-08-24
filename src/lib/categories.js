@@ -17,7 +17,7 @@ export const CATEGORIES = {
   },
   armcuff: {
     label: 'Arm Cuffs',
-    subtitle: 'Bold Statement Pieces for Your Wrist',
+    subtitle: 'Bold Statement Pieces for Your Arm',
   },
   charm: {
     label: 'Charms',

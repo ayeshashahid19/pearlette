@@ -25,6 +25,10 @@ export async function POST(request) {
 
     const formData = await request.formData()
     const file = formData.get('file')
+    const requestedFolder = String(formData.get('folder') || 'products')
+    const folder = ['products', 'categories'].includes(requestedFolder)
+      ? requestedFolder
+      : 'products'
 
     validateImageFile(file)
 
@@ -37,7 +41,7 @@ export async function POST(request) {
         filename: file.name || 'product-image',
         mimeType: file.type,
       },
-      { folder: 'products' }
+      { folder }
     )
 
     return jsonSuccess({ url: upload.url }, 201)

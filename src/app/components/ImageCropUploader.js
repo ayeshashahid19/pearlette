@@ -16,7 +16,7 @@ function clampOffset(offset, displayedSize, frame) {
   }
 }
 
-export default function ImageCropUploader({ value, onChange, label = 'Product Image' }) {
+export default function ImageCropUploader({ value, onChange, label = 'Product Image', folder = 'products' }) {
   const fileInputRef = useRef(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [imageSrc, setImageSrc] = useState('')
@@ -158,6 +158,9 @@ export default function ImageCropUploader({ value, onChange, label = 'Product Im
 
       const body = new FormData()
       body.append('file', blob, 'product-image.jpg')
+      if (folder) {
+        body.append('folder', folder)
+      }
 
       const response = await fetch('/api/admin/upload', { method: 'POST', body })
       const data = await response.json()

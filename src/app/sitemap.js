@@ -7,6 +7,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pearlette.pk'
 export default async function sitemap() {
   const staticRoutes = [
     '',
+    '/collections',
     '/necklace',
     '/bracelets',
     '/earrings',

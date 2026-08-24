@@ -180,10 +180,31 @@ async function seedProducts() {
   console.log(`   Featured: ${PRODUCTS.filter((p) => p.featured).length}`)
 }
 
+const CATEGORIES = [
+  { slug: 'necklace', name: 'Necklaces', sortOrder: 1 },
+  { slug: 'bracelets', name: 'Bracelets', sortOrder: 2 },
+  { slug: 'earrings', name: 'Earrings', sortOrder: 3 },
+  { slug: 'rings', name: 'Rings', sortOrder: 4 },
+  { slug: 'armcuffs', name: 'Arm Cuffs', sortOrder: 5 },
+  { slug: 'charms', name: 'Charms', sortOrder: 6 },
+]
+
+async function seedCategories() {
+  for (const category of CATEGORIES) {
+    await prisma.category.upsert({
+      where: { slug: category.slug },
+      update: { name: category.name, sortOrder: category.sortOrder },
+      create: { ...category, imgUrl: '/images/placeholder.jpg' },
+    })
+  }
+  console.log(`✅ ${CATEGORIES.length} categories seeded`)
+}
+
 async function main() {
   console.log('🌱 Seeding Pearlette.pk database...')
   await seedAdmin()
   await seedProducts()
+  await seedCategories()
   console.log('🎉 Seed complete')
 }
 

@@ -18,17 +18,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      style={{
-        background: "white",
-        padding: "10px 0",
-        boxShadow: "0 2px 20px rgba(245, 198, 203, 0.15)",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        width: "100%",
-      }}
-    >
+    <>
+      <div className="nav-spacer" aria-hidden="true" />
+      <nav
+        style={{
+          background: "white",
+          padding: "10px 0",
+          boxShadow: "0 2px 20px rgba(245, 198, 203, 0.15)",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          width: "100%",
+        }}
+      >
       <div
         style={{
           maxWidth: "1300px",
@@ -440,6 +444,21 @@ export default function Navbar() {
       )}
 
       <style jsx global>{`
+        /* Spacer reserves the navbar's height in the page flow (nav itself is fixed) */
+        .nav-spacer {
+          height: 57px;
+        }
+        @media (max-width: 768px) {
+          .nav-spacer {
+            height: 51px;
+          }
+        }
+        @media (max-width: 480px) {
+          .nav-spacer {
+            height: 41px;
+          }
+        }
+
         /* Dark pink hover states */
         .nav-pill-custom:hover,
         .nav-pill-cart:hover {
@@ -532,7 +551,8 @@ export default function Navbar() {
             height: 20px !important;
           }
         }
-      `}</style>
+      `}      </style>
     </nav>
+    </>
   );
 }

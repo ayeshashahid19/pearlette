@@ -86,3 +86,15 @@ model Admin {
 
   @@map("admins")
 }
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  imgUrl    String   @default("/images/placeholder.jpg")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { Heart } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { isValidPakistaniPhone } from "../../lib/validation.js";
@@ -203,7 +204,9 @@ export default function CustomPage() {
               boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
             }}
           >
-            <div style={{ fontSize: "3rem", marginBottom: "15px" }}>✨</div>
+            <div style={{ marginBottom: "15px" }} aria-hidden="true">
+              <Heart size={48} strokeWidth={1.5} color="#d49b9f" fill="#f5c6cb" />
+            </div>
             <h2
               style={{
                 fontSize: "2rem",
@@ -377,7 +380,7 @@ export default function CustomPage() {
               <span style={{ fontWeight: "600" }}>Delivery:</span> Cash on
               Delivery nationwide
               <br />
-              <span style={{ fontWeight: "600" }}>Timeline:</span> 7-14 days for
+              <span style={{ fontWeight: "600" }}>Timeline:</span> 3-5 days for
               custom pieces
             </p>
           </div>
@@ -763,6 +766,7 @@ export default function CustomPage() {
                     fontFamily: "inherit",
                     fontSize: "1rem",
                     background: "#fef9f7",
+                    color: "#3d2c2a",
                     transition: "0.3s",
                   }}
                 >
@@ -982,6 +986,7 @@ export default function CustomPage() {
                     fontFamily: "inherit",
                     fontSize: "1rem",
                     background: "#fef9f7",
+                    color: "#3d2c2a",
                     transition: "0.3s",
                   }}
                 >
@@ -1085,6 +1090,17 @@ export default function CustomPage() {
         .upload-dropzone:hover {
           border-color: #a34d54 !important;
           background: #fdf3f2 !important;
+        }
+        /* Keep native dropdown lists on the pink theme (no orange/black system colors) */
+        select {
+          color-scheme: light;
+          accent-color: #d49b9f;
+          color: #3d2c2a;
+        }
+        select option,
+        select optgroup {
+          background-color: #ffffff;
+          color: #3d2c2a;
         }
         /* Desktop: Show full info on left, hide mobile info */
         @media (min-width: 768px) {

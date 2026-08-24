@@ -39,13 +39,31 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
             background: 'linear-gradient(135deg, #fce4e6 0%, #fef9f7 100%)',
           }}
         >
+          {/* Hero photo backdrop */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/hero.png"
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center top',
+              zIndex: 0,
+            }}
+          />
+
+          {/* Soft veil keeps text readable over any photo */}
           <div
             aria-hidden="true"
             style={{
               position: 'absolute',
               inset: 0,
               background:
-                'radial-gradient(circle at 80% 20%, rgba(245, 198, 203, 0.35), transparent 50%), radial-gradient(circle at 20% 80%, rgba(212, 155, 159, 0.2), transparent 45%)',
+                'linear-gradient(180deg, rgba(254,249,247,0.72) 0%, rgba(254,249,247,0.5) 50%, rgba(254,249,247,0.68) 100%)',
               zIndex: 0,
             }}
           />
@@ -53,7 +71,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
           <div
             style={{
               position: 'relative',
-              zIndex: 1,
+              zIndex: 2,
               maxWidth: '1300px',
               margin: '0 auto',
               padding: '0 16px',
@@ -64,7 +82,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
               <div
                 style={{
                   display: 'inline-block',
-                  background: 'rgba(245, 198, 203, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.8)',
                   padding: '6px 16px',
                   borderRadius: '40px',
                   marginBottom: '15px',
@@ -86,7 +104,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
                   fontWeight: '600',
                 }}
               >
-                Premium
+                Pretty
                 <br />
                 <span style={{ color: '#d49b9f' }}>Handmade</span> Jewelry
               </h1>
@@ -112,7 +130,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
                 }}
               >
                 <Link
-                  href="/necklace"
+                  href="/collections"
                   className="btn-solid-pink"
                   style={{
                     background: '#d49b9f',
@@ -241,18 +259,45 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
               <p style={{ fontSize: '1.05rem', color: '#5f4a47', lineHeight: '2', marginBottom: '30px' }}>
                 Because sometimes, your dream jewelry is just one idea away from becoming real.
               </p>
-              <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
-                <div>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <div
+                  style={{
+                    background: '#fce4e6',
+                    border: '1px solid rgba(212, 155, 159, 0.3)',
+                    borderRadius: '18px',
+                    padding: '20px 26px',
+                    textAlign: 'center',
+                    minWidth: '130px',
+                  }}
+                >
                   <div style={statValueStyle}>100%</div>
                   <div style={statLabelStyle}>Handcrafted</div>
                 </div>
-                <div>
+                <div
+                  style={{
+                    background: '#fce4e6',
+                    border: '1px solid rgba(212, 155, 159, 0.3)',
+                    borderRadius: '18px',
+                    padding: '20px 26px',
+                    textAlign: 'center',
+                    minWidth: '130px',
+                  }}
+                >
                   <div style={{ ...statValueStyle }}>
                     <Gem size={26} strokeWidth={1.75} aria-hidden="true" />
                   </div>
                   <div style={statLabelStyle}>Premium Quality</div>
                 </div>
-                <div>
+                <div
+                  style={{
+                    background: '#fce4e6',
+                    border: '1px solid rgba(212, 155, 159, 0.3)',
+                    borderRadius: '18px',
+                    padding: '20px 26px',
+                    textAlign: 'center',
+                    minWidth: '130px',
+                  }}
+                >
                   <div style={{ ...statValueStyle }}>
                     <Heart size={26} strokeWidth={1.75} aria-hidden="true" />
                   </div>
