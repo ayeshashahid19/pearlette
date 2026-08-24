@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
@@ -11,10 +12,12 @@ import { useCart } from '../../context/CartContext'
 export default function ProductDetailClient({ product, relatedProducts }) {
   const [quantity, setQuantity] = useState(1)
   const { addItem } = useCart()
+  const router = useRouter()
   const categoryMeta = getCategoryMeta(product.category)
 
   const handleAddToCart = () => {
     addItem(product, quantity)
+    router.push('/cart')
   }
 
   return (

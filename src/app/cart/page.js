@@ -166,7 +166,7 @@ export default function CartPage() {
           <h1 style={{ fontSize: '2.5rem', color: '#3d2c2a', fontWeight: '600', margin: 0 }}>
             Your Cart
           </h1>
-            {items.length > 0 && (
+          {items.length > 0 && (
               <button
                 type="button"
                 onClick={clearCart}
@@ -361,6 +361,25 @@ export default function CartPage() {
                   <p style={{ color: '#5f4a47', fontSize: '0.85rem', marginTop: '10px' }}>
                     Shipping Rs. 280 · Cash on Delivery
                   </p>
+                  <Link
+                    href="/"
+                    className="btn-solid-pink"
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      marginTop: '16px',
+                      background: '#d49b9f',
+                      color: 'white',
+                      padding: '14px',
+                      borderRadius: '60px',
+                      textDecoration: 'none',
+                      fontWeight: '600',
+                      fontSize: '1rem',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    ← Continue Shopping
+                  </Link>
                 </div>
               </div>
             )}

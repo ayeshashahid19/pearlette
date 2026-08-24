@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCart } from '../context/CartContext'
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart()
+  const router = useRouter()
   const detailHref = product.slug ? `/products/${product.slug}` : null
 
   return (
@@ -67,6 +69,7 @@ export default function ProductCard({ product }) {
           e.stopPropagation()
           e.preventDefault()
           addItem(product, 1)
+          router.push('/cart')
         }}
         style={{
           background: '#fce4e6',
