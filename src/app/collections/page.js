@@ -74,7 +74,8 @@ export default async function CollectionsPage() {
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
+                    objectPosition: (category.slug === 'armcuffs' || category.slug === 'charms') ? 'center center' : 'center',
                     display: 'block',
                   }}
                 />
