@@ -352,8 +352,9 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
             gap: 30px !important;
           }
           .hero-bg {
-            background-size: 100% auto !important;
-            background-color: #fce4e6;
+            background-image: url(/images/hero-mobile.png) !important;
+            background-size: cover !important;
+            background-position: top center !important;
           }
         }
       `}</style>
