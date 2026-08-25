@@ -22,24 +22,10 @@ export async function uploadImage(file, { folder = 'custom-orders' } = {}) {
     throw new Error(`Unsupported storage provider: ${providerName}`)
   }
 
-  try {
-    return await upload({
-      buffer: file.buffer,
-      filename: file.filename,
-      mimeType: file.mimeType,
-      folder,
-    })
-  } catch (error) {
-    if (providerName !== 'local') {
-      console.warn(`Storage provider "${providerName}" failed, falling back to local:`, error.message)
-      return uploadLocal({
-        buffer: file.buffer,
-        filename: file.filename,
-        mimeType: file.mimeType,
-        folder,
-      })
-    }
-
-    throw error
-  }
+  return await upload({
+    buffer: file.buffer,
+    filename: file.filename,
+    mimeType: file.mimeType,
+    folder,
+  })
 }

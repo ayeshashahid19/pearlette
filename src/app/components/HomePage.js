@@ -42,6 +42,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
           {/* Hero photo backdrop */}
           <div
             aria-hidden="true"
+            className="hero-bg"
             style={{
               position: 'absolute',
               top: 0,
@@ -349,6 +350,10 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
           .story-grid {
             grid-template-columns: 1fr !important;
             gap: 30px !important;
+          }
+          .hero-bg {
+            background-size: 100% auto !important;
+            background-color: #fce4e6;
           }
         }
       `}</style>
