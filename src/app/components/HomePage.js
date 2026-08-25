@@ -40,22 +40,18 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
           }}
         >
           {/* Hero photo backdrop */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/hero.png"
-            alt=""
+          <div
             aria-hidden="true"
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              right: 0,
-              bottom: 0,
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center top',
-              display: 'block',
+              backgroundImage: 'url(/images/hero.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center top',
+              backgroundRepeat: 'no-repeat',
               zIndex: 0,
             }}
           />
@@ -65,7 +61,10 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
             aria-hidden="true"
             style={{
               position: 'absolute',
-              inset: 0,
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
               background:
                 'linear-gradient(180deg, rgba(254,249,247,0.72) 0%, rgba(254,249,247,0.5) 50%, rgba(254,249,247,0.68) 100%)',
               zIndex: 0,
@@ -263,45 +262,18 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
               <p style={{ fontSize: '1.05rem', color: '#5f4a47', lineHeight: '2', marginBottom: '30px' }}>
                 Because sometimes, your dream jewelry is just one idea away from becoming real.
               </p>
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <div
-                  style={{
-                    background: '#fce4e6',
-                    border: '1px solid rgba(212, 155, 159, 0.3)',
-                    borderRadius: '18px',
-                    padding: '20px 26px',
-                    textAlign: 'center',
-                    minWidth: '130px',
-                  }}
-                >
+              <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
+                <div>
                   <div style={statValueStyle}>100%</div>
                   <div style={statLabelStyle}>Handcrafted</div>
                 </div>
-                <div
-                  style={{
-                    background: '#fce4e6',
-                    border: '1px solid rgba(212, 155, 159, 0.3)',
-                    borderRadius: '18px',
-                    padding: '20px 26px',
-                    textAlign: 'center',
-                    minWidth: '130px',
-                  }}
-                >
+                <div>
                   <div style={{ ...statValueStyle }}>
                     <Gem size={26} strokeWidth={1.75} aria-hidden="true" />
                   </div>
                   <div style={statLabelStyle}>Premium Quality</div>
                 </div>
-                <div
-                  style={{
-                    background: '#fce4e6',
-                    border: '1px solid rgba(212, 155, 159, 0.3)',
-                    borderRadius: '18px',
-                    padding: '20px 26px',
-                    textAlign: 'center',
-                    minWidth: '130px',
-                  }}
-                >
+                <div>
                   <div style={{ ...statValueStyle }}>
                     <Heart size={26} strokeWidth={1.75} aria-hidden="true" />
                   </div>

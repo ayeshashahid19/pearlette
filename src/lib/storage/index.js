@@ -9,7 +9,9 @@ const providers = {
 }
 
 export function getStorageProviderName() {
-  return (process.env.STORAGE_PROVIDER || 'local').toLowerCase()
+  if (process.env.STORAGE_PROVIDER) return process.env.STORAGE_PROVIDER.toLowerCase()
+  if (process.env.BLOB_READ_WRITE_TOKEN) return 'vercel-blob'
+  return 'local'
 }
 
 export async function uploadImage(file, { folder = 'custom-orders' } = {}) {

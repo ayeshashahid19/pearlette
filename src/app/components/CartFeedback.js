@@ -1,5 +1,6 @@
 'use client'
 
+import { Heart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
 export default function CartFeedback() {
@@ -26,9 +27,13 @@ export default function CartFeedback() {
         zIndex: 1000,
         maxWidth: '90vw',
         textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
       }}
     >
-      ✨ {feedback}
+      <Heart size={16} fill="#d49b9f" stroke="#d49b9f" aria-hidden="true" />
+      {feedback}
     </div>
   )
 }
