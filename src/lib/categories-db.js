@@ -10,11 +10,20 @@ export const FALLBACK_CATEGORIES = [
 ]
 
 export function serializeCategory(category) {
+  const imageMap = {
+    necklace: '/images/categories/necklace.jpg',
+    bracelets: '/images/categories/bracelets.jpg',
+    earrings: '/images/categories/earrings.jpg',
+    rings: '/images/categories/rings.jpg',
+    armcuffs: '/images/categories/armcuffs.jpg',
+    charms: '/images/categories/charms.jpg',
+  }
+
   return {
     id: category.id,
     slug: category.slug,
     name: category.name,
-    imgUrl: category.imgUrl,
+    imgUrl: imageMap[category.slug] || '/images/categories/necklace.jpg',
     sortOrder: category.sortOrder,
     updatedAt: category.updatedAt,
   }

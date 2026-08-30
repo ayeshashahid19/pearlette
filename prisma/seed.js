@@ -181,22 +181,57 @@ async function seedProducts() {
 }
 
 const CATEGORIES = [
-  { slug: 'necklace', name: 'Necklaces', sortOrder: 1 },
-  { slug: 'bracelets', name: 'Bracelets', sortOrder: 2 },
-  { slug: 'earrings', name: 'Earrings', sortOrder: 3 },
-  { slug: 'rings', name: 'Rings', sortOrder: 4 },
-  { slug: 'armcuffs', name: 'Arm Cuffs', sortOrder: 5 },
-  { slug: 'charms', name: 'Charms', sortOrder: 6 },
+  {
+    slug: 'necklace',
+    name: 'Necklaces',
+    sortOrder: 1,
+    imgUrl: '/images/categories/necklace.jpg',
+  },
+  {
+    slug: 'bracelets',
+    name: 'Bracelets',
+    sortOrder: 2,
+    imgUrl: '/images/categories/bracelets.jpg',
+  },
+  {
+    slug: 'earrings',
+    name: 'Earrings',
+    sortOrder: 3,
+    imgUrl: '/images/categories/earrings.jpg',
+  },
+  {
+    slug: 'rings',
+    name: 'Rings',
+    sortOrder: 4,
+    imgUrl: '/images/categories/rings.jpg',
+  },
+  {
+    slug: 'armcuffs',
+    name: 'Arm Cuffs',
+    sortOrder: 5,
+    imgUrl: '/images/categories/armcuffs.jpg',
+  },
+  {
+    slug: 'charms',
+    name: 'Charms',
+    sortOrder: 6,
+    imgUrl: '/images/categories/charms.jpg',
+  },
 ]
 
 async function seedCategories() {
   for (const category of CATEGORIES) {
     await prisma.category.upsert({
       where: { slug: category.slug },
-      update: { name: category.name, sortOrder: category.sortOrder },
-      create: { ...category, imgUrl: '/images/placeholder.jpg' },
+      update: {
+        name: category.name,
+        sortOrder: category.sortOrder,
+        imgUrl: category.imgUrl,
+      },
+      create: category,
     })
   }
+
   console.log(`✅ ${CATEGORIES.length} categories seeded`)
 }
 
