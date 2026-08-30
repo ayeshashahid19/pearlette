@@ -9,21 +9,32 @@ export const FALLBACK_CATEGORIES = [
   { id: 'charms', slug: 'charms', name: 'Charms', imgUrl: '/images/categories/charms.jpg', sortOrder: 6 },
 ]
 
-export function serializeCategory(category) {
-  const imageMap = {
-    necklace: '/images/categories/necklace.jpg',
-    bracelets: '/images/categories/bracelets.jpg',
-    earrings: '/images/categories/earrings.jpg',
-    rings: '/images/categories/rings.jpg',
-    armcuffs: '/images/categories/armcuffs.jpg',
-    charms: '/images/categories/charms.jpg',
-  }
+const CATEGORY_IMAGE_MAP = {
+  necklace: '/images/categories/necklace.jpg',
+  bracelets: '/images/categories/bracelets.jpg',
+  earrings: '/images/categories/earrings.jpg',
+  rings: '/images/categories/rings.jpg',
+  armcuffs: '/images/categories/armcuffs.jpg',
+  charms: '/images/categories/charms.jpg',
+}
 
+function resolveCategoryImgUrl(category) {
+  const dbUrl = category.imgUrl?.trim()
+  const isValidDbUrl =
+    dbUrl &&
+    dbUrl !== '/images/placeholder.jpg' &&
+    (dbUrl.startsWith('/') || dbUrl.startsWith('https://'))
+
+  if (isValidDbUrl) return dbUrl
+  return CATEGORY_IMAGE_MAP[category.slug] || '/images/categories/necklace.jpg'
+}
+
+export function serializeCategory(category) {
   return {
     id: category.id,
     slug: category.slug,
     name: category.name,
-    imgUrl: imageMap[category.slug] || '/images/categories/necklace.jpg',
+    imgUrl: resolveCategoryImgUrl(category),
     sortOrder: category.sortOrder,
     updatedAt: category.updatedAt,
   }

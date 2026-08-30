@@ -1,5 +1,6 @@
 import { prisma } from '../../../../../lib/prisma.js'
 import { requireAdmin } from '../../../../../lib/auth.js'
+import { serializeCategory } from '../../../../../lib/categories-db.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../../../lib/api-error.js'
 
 function isValidImgUrl(url) {
@@ -23,7 +24,7 @@ export async function GET(request, { params }) {
       return jsonError('Category not found.', 404)
     }
 
-    return jsonSuccess({ category })
+    return jsonSuccess({ category: serializeCategory(category) })
   } catch (error) {
     return handleApiError(error, 'Failed to load category.')
   }
@@ -59,6 +60,14 @@ export async function PATCH(request, { params }) {
       data.imgUrl = body.imgUrl
     }
 
+    if (body?.sortOrder !== undefined) {
+      const sortOrder = Number(body.sortOrder)
+      if (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 999) {
+        return jsonError('Sort order must be an integer between 0 and 999.', 400)
+      }
+      data.sortOrder = sortOrder
+    }
+
     if (Object.keys(data).length === 0) {
       return jsonError('Nothing to update.', 400)
     }
@@ -68,7 +77,7 @@ export async function PATCH(request, { params }) {
       data,
     })
 
-    return jsonSuccess({ category })
+    return jsonSuccess({ category: serializeCategory(category) })
   } catch (error) {
     return handleApiError(error, 'Failed to update category.')
   }
