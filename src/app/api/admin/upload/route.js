@@ -35,6 +35,12 @@ export async function POST(request) {
     const buffer = Buffer.from(await file.arrayBuffer())
     validateImageBuffer(buffer, file.type)
 
+    const providerName = process.env.STORAGE_PROVIDER || (process.env.BLOB_READ_WRITE_TOKEN ? 'vercel-blob' : 'local')
+
+    if (providerName === 'local' && process.env.VERCEL) {
+      return jsonError('Image uploads require a Blob store on Vercel. Connect one in Settings → Storage.', 500)
+    }
+
     const upload = await uploadImage(
       {
         buffer,
@@ -43,12 +49,6 @@ export async function POST(request) {
       },
       { folder }
     )
-
-    const providerName = process.env.STORAGE_PROVIDER || (process.env.BLOB_READ_WRITE_TOKEN ? 'vercel-blob' : 'local')
-
-    if (providerName === 'local' && process.env.VERCEL) {
-      return jsonError('Image uploads require a Blob store on Vercel. Connect one in Settings → Storage.', 500)
-    }
 
     return jsonSuccess({ url: upload.url }, 201)
   } catch (error) {
