@@ -3,6 +3,8 @@ import { prisma } from '../../../../lib/prisma.js'
 import { getAdminSession } from '../../../../lib/auth.js'
 import { validateProductInput, ValidationError } from '../../../../lib/validation.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../../lib/api-error.js'
+import { revalidatePath } from 'next/cache'
+import { getCategoryPath } from '../../../../lib/categories.js'
 
 export async function GET(request, { params }) {
   try {
@@ -50,6 +52,13 @@ export async function PUT(request, { params }) {
       data,
     })
 
+    revalidatePath('/')
+    revalidatePath('/collections')
+    revalidatePath(getCategoryPath(product.category))
+    if (product.slug) {
+      revalidatePath(`/products/${product.slug}`)
+    }
+
     return jsonSuccess({ product: serializeProduct(product) })
   } catch (error) {
     if (error instanceof ValidationError) {
@@ -78,6 +87,13 @@ export async function DELETE(request, { params }) {
       where: { id },
       data: { isActive: false },
     })
+
+    revalidatePath('/')
+    revalidatePath('/collections')
+    revalidatePath(getCategoryPath(product.category))
+    if (product.slug) {
+      revalidatePath(`/products/${product.slug}`)
+    }
 
     return jsonSuccess({ product: serializeProduct(product) })
   } catch (error) {
