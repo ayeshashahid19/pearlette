@@ -83,9 +83,8 @@ export async function DELETE(request, { params }) {
       return jsonError('Product not found.', 404)
     }
 
-    const product = await prisma.product.update({
+    const product = await prisma.product.delete({
       where: { id },
-      data: { isActive: false },
     })
 
     revalidatePath('/')
@@ -97,6 +96,6 @@ export async function DELETE(request, { params }) {
 
     return jsonSuccess({ product: serializeProduct(product) })
   } catch (error) {
-    return handleApiError(error, 'Failed to deactivate product.')
+    return handleApiError(error, 'Failed to delete product.')
   }
 }

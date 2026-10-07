@@ -304,6 +304,32 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleDelete = async (product) => {
+    if (!window.confirm(`Are you sure you want to PERMANENTLY delete "${product.name}"?\nThis action cannot be undone.`)) {
+      return
+    }
+
+    setRowBusyId(product.id)
+
+    try {
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to delete product.')
+      }
+
+      setProducts((prev) => prev.filter((p) => p.id !== product.id))
+      refresh()
+    } catch (error) {
+      window.alert(error.message)
+    } finally {
+      setRowBusyId(null)
+    }
+  }
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
@@ -423,6 +449,23 @@ export default function AdminProductsPage() {
                       }}
                     >
                       {product.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product)}
+                      disabled={rowBusyId === product.id}
+                      style={{
+                        padding: '6px 16px',
+                        marginLeft: '8px',
+                        borderRadius: '40px',
+                        border: 'none',
+                        background: '#dc3545',
+                        color: 'white',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        cursor: rowBusyId === product.id ? 'wait' : 'pointer',
+                      }}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
