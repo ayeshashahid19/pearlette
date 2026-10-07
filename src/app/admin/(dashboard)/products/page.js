@@ -248,6 +248,18 @@ export default function AdminProductsPage() {
         throw new Error(data.error || 'Failed to save product.')
       }
 
+      setProducts((prev) => {
+        const exists = prev.some((p) => p.id === data.product.id)
+        const next = exists
+          ? prev.map((p) => (p.id === data.product.id ? data.product : p))
+          : [...prev, data.product]
+        
+        return next.sort((a, b) => {
+          if (a.featured !== b.featured) return a.featured ? -1 : 1
+          return new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+        })
+      })
+
       setShowForm(false)
       refresh()
     } catch (error) {
