@@ -94,6 +94,8 @@ export class ValidationError extends Error {
   }
 }
 
+export const MAX_ITEM_QUANTITY = 99
+
 const PK_PHONE_REGEX = /^(?:\+92|92|0)?3[0-9]{9}$/
 
 export function normalizePhone(phone) {
@@ -149,27 +151,68 @@ export function validateOrderInput(body) {
         return
       }
 
-      if (!item.productId || typeof item.productId !== 'string') {
+      if (
+        !item.productId ||
+        typeof item.productId !== 'string' ||
+        !item.productId.trim()
+      ) {
         errors.push(`Item ${index + 1} is missing a product ID.`)
       }
 
       const quantity = Number(item.quantity)
-      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
-        errors.push(`Item ${index + 1} must have a quantity between 1 and 99.`)
+      if (
+        !Number.isInteger(quantity) ||
+        quantity < 1 ||
+        quantity > MAX_ITEM_QUANTITY
+      ) {
+        errors.push(
+          `Item ${index + 1} must have a quantity between 1 and ${MAX_ITEM_QUANTITY}.`
+        )
       }
     })
   }
 
-  if (errors.length) {
-    throw new ValidationError(errors.join(' '))
+  // Merge duplicate product lines before validating and returning so the
+  // quantity cap applies to the combined line. Without this, two entries of
+  // 60 would each pass the per-line check and produce a quantity of 120.
+  const mergedItems = new Map()
+  let hasDuplicateLines = false
+
+  if (Array.isArray(body.items)) {
+    for (const item of body.items) {
+      if (!item || typeof item !== 'object' || typeof item.productId !== 'string') {
+        continue
+      }
+
+      const productId = item.productId.trim()
+      const quantity = Number(item.quantity)
+
+      if (!productId || !Number.isInteger(quantity)) continue
+
+      if (mergedItems.has(productId)) hasDuplicateLines = true
+      mergedItems.set(productId, (mergedItems.get(productId) || 0) + quantity)
+    }
+
+    // No order should ever be created from an empty item list. Invalid lines
+    // are reported as errors above, so this is a final guard.
+    if (body.items.length > 0 && mergedItems.size === 0 && errors.length === 0) {
+      errors.push('At least one cart item is required.')
+    }
+
+    if (hasDuplicateLines) {
+      for (const quantity of mergedItems.values()) {
+        if (quantity > MAX_ITEM_QUANTITY) {
+          errors.push(
+            `Combined quantity for a single item cannot exceed ${MAX_ITEM_QUANTITY}.`
+          )
+          break
+        }
+      }
+    }
   }
 
-  const mergedItems = new Map()
-
-  for (const item of body.items) {
-    const productId = item.productId.trim()
-    const quantity = Number(item.quantity)
-    mergedItems.set(productId, (mergedItems.get(productId) || 0) + quantity)
+  if (errors.length) {
+    throw new ValidationError(errors.join(' '))
   }
 
   return {

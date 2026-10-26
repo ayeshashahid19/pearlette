@@ -3,6 +3,7 @@ import { serializeOrder } from '../../../lib/orders.js'
 import { validateOrderInput, ValidationError } from '../../../lib/validation.js'
 import { handleApiError, jsonError, jsonSuccess } from '../../../lib/api-error.js'
 import { getClientIp, rateLimit } from '../../../lib/rate-limit.js'
+import { calculateTotals } from '../../../lib/pricing.js'
 
 export async function POST(request) {
   try {
@@ -15,6 +16,10 @@ export async function POST(request) {
 
     const body = await request.json()
     const data = validateOrderInput(body)
+
+    if (data.items.length === 0) {
+      return jsonError('At least one cart item is required.', 400)
+    }
 
     const productIds = data.items.map((item) => item.productId)
     const products = await prisma.product.findMany({
@@ -40,7 +45,9 @@ export async function POST(request) {
       }
     })
 
-    const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    // Prices come from the database (product.price), never from the client
+    // payload, so a manipulated client total or price cannot affect the order.
+    const { total } = calculateTotals(orderItems)
 
     const order = await prisma.order.create({
       data: {

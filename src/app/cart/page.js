@@ -2,13 +2,84 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useCart } from '../context/CartContext'
 import { isValidPakistaniPhone } from '../../lib/validation.js'
+import { calculateTotals } from '../../lib/pricing.js'
 
 const FIELD_ORDER = ['name', 'email', 'address', 'city', 'phone']
+
+function formatPrice(value) {
+  return Number.isFinite(value) ? `Rs. ${value.toLocaleString()}` : null
+}
+
+function describeItems(names, limit = 3) {
+  const unique = [...new Set(names.filter(Boolean))]
+  if (unique.length === 0) return 'An item'
+  if (unique.length === 1) return unique[0]
+
+  const shown = unique.slice(0, limit)
+  const remaining = unique.length - shown.length
+
+  return remaining > 0
+    ? `${shown.join(', ')} and ${remaining} more`
+    : shown.join(', ')
+}
+
+function buildNotice({ priceChanges = [], removed = [], issues = [] }) {
+  const parts = []
+
+  if (issues.some((issue) => issue.type === 'unreadable')) {
+    parts.push('Your saved cart could not be read, so it may be incomplete.')
+  }
+
+  const unrestorable = issues.filter((issue) => issue.type === 'removed')
+  if (unrestorable.length > 0) {
+    parts.push(
+      `${describeItems(unrestorable.map((issue) => issue.name))} could not be restored and ${
+        unrestorable.length > 1 ? 'were' : 'was'
+      } removed from your cart.`
+    )
+  }
+
+  const adjusted = issues.filter((issue) => issue.type === 'quantity')
+  if (adjusted.length > 0) {
+    parts.push(
+      `Cart quantity was adjusted for ${describeItems(
+        adjusted.map((issue) => issue.name)
+      )}.`
+    )
+  }
+
+  if (removed.length > 0) {
+    const uniqueRemoved = [...new Set(removed)]
+    parts.push(
+      `${describeItems(uniqueRemoved)} ${
+        uniqueRemoved.length > 1 ? 'are' : 'is'
+      } no longer available and ${
+        uniqueRemoved.length > 1 ? 'were' : 'was'
+      } removed from your cart.`
+    )
+  }
+
+  if (priceChanges.length > 0) {
+    const changes = priceChanges.slice(0, 3).map((change) => {
+      const from = formatPrice(change.from)
+      return `${change.name} (${from ? `${from} → ` : ''}${formatPrice(change.to)})`
+    })
+    const remaining = priceChanges.length - changes.length
+
+    parts.push(
+      `Prices updated: ${changes.join(', ')}${
+        remaining > 0 ? ` and ${remaining} more` : ''
+      }.`
+    )
+  }
+
+  return parts.join(' ')
+}
 
 export default function CartPage() {
   const router = useRouter()
@@ -19,7 +90,9 @@ export default function CartPage() {
     decrementItem,
     removeItem,
     clearCart,
-    getSubtotal,
+    refreshItems,
+    storageIssues,
+    getCartVersion,
   } = useCart()
 
   const [deliveryDetails, setDeliveryDetails] = useState({
@@ -35,8 +108,43 @@ export default function CartPage() {
   const [fieldErrors, setFieldErrors] = useState({})
   const fieldRefs = useRef({})
   const formRef = useRef(null)
+  const [notice, setNotice] = useState('')
+  const [noticeIsAlert, setNoticeIsAlert] = useState(false)
+  const didInitialRefresh = useRef(false)
+  const submitLockRef = useRef(false)
+  const itemsRef = useRef(items)
+  const storageIssuesRef = useRef(storageIssues)
 
-  const subtotal = getSubtotal()
+  useEffect(() => {
+    itemsRef.current = items
+  }, [items])
+
+  useEffect(() => {
+    storageIssuesRef.current = storageIssues
+  }, [storageIssues])
+
+  useEffect(() => {
+    if (!isHydrated || didInitialRefresh.current) return
+    didInitialRefresh.current = true
+
+    refreshItems()
+      .then((result) => {
+        setNotice(buildNotice({ ...result, issues: storageIssuesRef.current }))
+        setNoticeIsAlert(false)
+      })
+      .catch(() => {
+        setNotice(
+          itemsRef.current.length > 0
+            ? "We couldn't confirm current prices. They will be checked again when you place your order."
+            : ''
+        )
+        setNoticeIsAlert(false)
+      })
+    // storageIssues is read through a ref so this only runs once per mount.
+  }, [isHydrated, refreshItems])
+
+  const { subtotal, shipping, total } = calculateTotals(items)
+  const hasKnownPrices = items.every((item) => Number.isFinite(item.price))
 
   const handleInputChange = (e) => {
     setDeliveryDetails({
@@ -87,54 +195,98 @@ export default function CartPage() {
   const handlePlaceOrder = async (e) => {
     e.preventDefault()
 
-    if (items.length === 0) {
-      setFormError('Your cart is empty.')
-      return
-    }
-
-    const errors = validateFields()
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors)
-      setFormError('Please fix the highlighted fields below.')
-      scrollToFirstError(errors)
-      return
-    }
-
-    setSubmitting(true)
-    setFormError('')
-    setFieldErrors({})
+    // State updates are not a synchronous re-entry guard, so claim the lock
+    // before the first await. Overlapping calls return here immediately.
+    if (submitLockRef.current) return
+    submitLockRef.current = true
 
     try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: deliveryDetails.name,
-          customerEmail: deliveryDetails.email || null,
-          customerPhone: deliveryDetails.phone,
-          customerAddress: deliveryDetails.address,
-          customerCity: deliveryDetails.city,
-          customerInstructions: deliveryDetails.instructions || null,
-          items: items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to place order.')
+      if (items.length === 0) {
+        setFormError('Your cart is empty.')
+        return
       }
 
-      clearCart()
-      router.push(`/cart/success?orderId=${data.order.id}`)
-    } catch (error) {
-      setFormError(error.message)
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const errors = validateFields()
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors)
+        setFormError('Please fix the highlighted fields below.')
+        scrollToFirstError(errors)
+        return
+      }
+
+      setSubmitting(true)
+      setFormError('')
+      setFieldErrors({})
+      setNotice('')
+      setNoticeIsAlert(false)
+
+      const startVersion = getCartVersion()
+
+      try {
+        let refresh
+
+        try {
+          refresh = await refreshItems({ force: true })
+        } catch {
+          setFormError("We couldn't confirm current prices. Please try again.")
+          return
+        }
+
+        // This narrows the window, but it cannot guarantee the price stays the
+        // same between this check and the order API's database read. The order
+        // API remains the authority for the final stored total.
+        if (refresh.changed) {
+          setNotice(
+            buildNotice(refresh) ||
+              'Your cart was updated. Please review the total and place the order again.'
+          )
+          setNoticeIsAlert(true)
+          return
+        }
+
+        // Cart controls are disabled while submitting, but guard against edits
+        // from any other code path: never submit a snapshot that no longer
+        // matches the current cart.
+        if (getCartVersion() !== startVersion) {
+          setNotice(
+            'Your cart changed while we were checking prices. Please review your cart and place the order again.'
+          )
+          setNoticeIsAlert(true)
+          return
+        }
+
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName: deliveryDetails.name,
+            customerEmail: deliveryDetails.email || null,
+            customerPhone: deliveryDetails.phone,
+            customerAddress: deliveryDetails.address,
+            customerCity: deliveryDetails.city,
+            customerInstructions: deliveryDetails.instructions || null,
+            items: items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            })),
+          }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to place order.')
+        }
+
+        clearCart()
+        router.push(`/cart/success?orderId=${data.order.id}`)
+      } catch (error) {
+        setFormError(error.message)
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     } finally {
       setSubmitting(false)
+      submitLockRef.current = false
     }
   }
 
@@ -170,6 +322,7 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={clearCart}
+                disabled={submitting}
                 className="btn-ghost-pink"
                 style={{
                   background: 'transparent',
@@ -177,9 +330,10 @@ export default function CartPage() {
                   color: '#5f4a47',
                   padding: '10px 18px',
                   borderRadius: '999px',
-                  cursor: 'pointer',
+                  cursor: submitting ? 'not-allowed' : 'pointer',
                   fontFamily: 'inherit',
                   fontWeight: '500',
+                  opacity: submitting ? 0.6 : 1,
                   transition: 'color 0.2s ease, border-color 0.2s ease',
                 }}
               >
@@ -187,6 +341,26 @@ export default function CartPage() {
               </button>
             )}
         </div>
+
+        {notice && (
+          <div
+            role={noticeIsAlert ? 'alert' : 'status'}
+            aria-live={noticeIsAlert ? 'assertive' : 'polite'}
+            aria-atomic="true"
+            style={{
+              background: '#fce4e6',
+              border: '1px solid #f0dbd9',
+              color: '#3d2c2a',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              marginBottom: '24px',
+              fontSize: '0.9rem',
+              lineHeight: '1.6',
+            }}
+          >
+            {notice}
+          </div>
+        )}
 
         <div
           style={{
@@ -275,10 +449,14 @@ export default function CartPage() {
                         <h3 style={{ color: '#3d2c2a', margin: 0 }}>{item.name}</h3>
                       )}
                       <p style={{ color: '#d49b9f', fontWeight: '600', margin: '6px 0 0' }}>
-                        Rs. {item.price.toLocaleString()}
+                        {Number.isFinite(item.price)
+                          ? `Rs. ${item.price.toLocaleString()}`
+                          : 'Confirming price…'}
                       </p>
                       <p style={{ color: '#5f4a47', fontSize: '0.85rem', margin: '4px 0 0' }}>
-                        Line total: Rs. {(item.price * item.quantity).toLocaleString()}
+                        {Number.isFinite(item.price)
+                          ? `Line total: Rs. ${(item.price * item.quantity).toLocaleString()}`
+                          : 'Line total: confirming price…'}
                       </p>
                     </div>
 
@@ -288,8 +466,13 @@ export default function CartPage() {
                           type="button"
                           aria-label={`Decrease quantity of ${item.name}`}
                           onClick={() => decrementItem(item.productId)}
+                          disabled={submitting}
                           className="qty-btn"
-                          style={qtyButtonStyle}
+                          style={{
+                            ...qtyButtonStyle,
+                            cursor: submitting ? 'not-allowed' : 'pointer',
+                            opacity: submitting ? 0.5 : 1,
+                          }}
                         >
                           −
                         </button>
@@ -300,8 +483,13 @@ export default function CartPage() {
                           type="button"
                           aria-label={`Increase quantity of ${item.name}`}
                           onClick={() => incrementItem(item.productId)}
+                          disabled={submitting}
                           className="qty-btn"
-                          style={qtyButtonStyle}
+                          style={{
+                            ...qtyButtonStyle,
+                            cursor: submitting ? 'not-allowed' : 'pointer',
+                            opacity: submitting ? 0.5 : 1,
+                          }}
                         >
                           +
                         </button>
@@ -309,15 +497,17 @@ export default function CartPage() {
                       <button
                         type="button"
                         onClick={() => removeItem(item.productId)}
+                        disabled={submitting}
                         style={{
                           background: '#ff6b6b',
                           color: 'white',
                           border: 'none',
                           padding: '6px 12px',
                           borderRadius: '8px',
-                          cursor: 'pointer',
+                          cursor: submitting ? 'not-allowed' : 'pointer',
                           fontFamily: 'inherit',
                           fontSize: '0.85rem',
+                          opacity: submitting ? 0.6 : 1,
                         }}
                       >
                         Remove
@@ -345,7 +535,21 @@ export default function CartPage() {
                     }}
                   >
                     <span>Subtotal</span>
-                    <span>Rs. {subtotal.toLocaleString()}</span>
+                    <span>
+                      {hasKnownPrices ? `Rs. ${subtotal.toLocaleString()}` : 'Confirming…'}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '1rem',
+                      marginBottom: '8px',
+                      color: '#5f4a47',
+                    }}
+                  >
+                    <span>Shipping</span>
+                    <span>Rs. {shipping.toLocaleString()}</span>
                   </div>
                   <div
                     style={{
@@ -353,13 +557,17 @@ export default function CartPage() {
                       justifyContent: 'space-between',
                       fontSize: '1.2rem',
                       fontWeight: '700',
+                      paddingTop: '8px',
+                      borderTop: '1px solid #fce4e6',
                     }}
                   >
                     <span style={{ color: '#3d2c2a' }}>Total</span>
-                    <span style={{ color: '#d49b9f' }}>Rs. {subtotal.toLocaleString()}</span>
+                    <span style={{ color: '#d49b9f' }}>
+                      {hasKnownPrices ? `Rs. ${total.toLocaleString()}` : 'Confirming…'}
+                    </span>
                   </div>
                   <p style={{ color: '#5f4a47', fontSize: '0.85rem', marginTop: '10px' }}>
-                    Shipping Rs. 280 · Cash on Delivery
+                    Cash on Delivery
                   </p>
                   <Link
                     href="/"
