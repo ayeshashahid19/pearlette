@@ -58,7 +58,7 @@ export default function Navbar() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/logo.png"
+            src="/images/logo.webp"
             alt="Pearlette.pk logo"
             className="nav-logo"
             style={{

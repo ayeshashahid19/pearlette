@@ -63,7 +63,7 @@ const Footer = () => {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/logo.png"
+              src="/images/logo.webp"
               alt=""
               width="26"
               height="26"

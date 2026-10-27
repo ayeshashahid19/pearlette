@@ -185,7 +185,7 @@ const CATEGORIES = [
     slug: 'necklace',
     name: 'Necklaces',
     sortOrder: 1,
-    imgUrl: '/images/categories/necklace.png',
+    imgUrl: '/images/categories/necklace.webp',
   },
   {
     slug: 'bracelets',
@@ -209,7 +209,7 @@ const CATEGORIES = [
     slug: 'armcuffs',
     name: 'Arm Cuffs',
     sortOrder: 5,
-    imgUrl: '/images/categories/armcuffs.png',
+    imgUrl: '/images/categories/armcuffs.webp',
   },
   {
     slug: 'charms',

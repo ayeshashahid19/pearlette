@@ -1,11 +1,11 @@
 import { prisma } from '../src/lib/prisma.js'
 
 const updates = [
-  { slug: 'necklace', imgUrl: '/images/categories/necklace.png' },
+  { slug: 'necklace', imgUrl: '/images/categories/necklace.webp' },
   { slug: 'bracelets', imgUrl: '/images/categories/bracelets.jpg' },
   { slug: 'earrings', imgUrl: '/images/categories/earrings.jpg' },
   { slug: 'rings', imgUrl: '/images/categories/rings.jpg' },
-  { slug: 'armcuffs', imgUrl: '/images/categories/armcuffs.png' },
+  { slug: 'armcuffs', imgUrl: '/images/categories/armcuffs.webp' },
   { slug: 'charms', imgUrl: '/images/categories/charms.jpg' },
 ]
 

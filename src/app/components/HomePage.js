@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { Gem, Heart } from 'lucide-react'
 import Navbar from './Navbar'
 import Footer from './Footer'
@@ -49,7 +50,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundImage: 'url(/images/hero.png)',
+              backgroundImage: 'url(/images/hero.webp)',
               backgroundSize: 'cover',
               backgroundPosition: 'center top',
               backgroundRepeat: 'no-repeat',
@@ -206,24 +207,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
                 }}
               >
                 {brandVideoUrl ? (
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    src={brandVideoUrl}
-                    poster={brandVideoPoster || undefined}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center',
-                      display: 'block',
-                      background: '#3d2c2a',
-                    }}
-                  >
-                    Your browser does not support video playback.
-                  </video>
+                  <BrandStoryVideo src={brandVideoUrl} poster={brandVideoPoster} />
                 ) : (
                   'Brand media placeholder'
                 )}
@@ -352,12 +336,90 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
             gap: 30px !important;
           }
           .hero-bg {
-            background-image: url(/images/hero-mobile.png) !important;
+            background-image: url(/images/hero-mobile.webp) !important;
             background-size: cover !important;
             background-position: top center !important;
           }
         }
       `}</style>
     </div>
+  )
+}
+
+function BrandStoryVideo({ src, poster }) {
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    // Leave the poster visible and never fetch the video for reduced-motion users.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+    const play = () => {
+      if (!video.paused) return
+      const attempt = video.play()
+      if (attempt?.catch) attempt.catch(() => {})
+    }
+    const pause = () => {
+      if (!video.paused) video.pause()
+    }
+
+    // Safe fallback: only start when the element scrolls near the viewport.
+    if (typeof IntersectionObserver === 'undefined') {
+      let frame = 0
+      const check = () => {
+        frame = 0
+        const rect = video.getBoundingClientRect()
+        if (rect.top < window.innerHeight + 200 && rect.bottom > -200) play()
+        else pause()
+      }
+      const schedule = () => {
+        if (frame) return
+        frame = window.requestAnimationFrame(check)
+      }
+      window.addEventListener('scroll', schedule, { passive: true })
+      window.addEventListener('resize', schedule)
+      check()
+      return () => {
+        if (frame) window.cancelAnimationFrame(frame)
+        window.removeEventListener('scroll', schedule)
+        window.removeEventListener('resize', schedule)
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[entries.length - 1]
+        if (!entry) return
+        if (entry.isIntersecting) play()
+        else pause()
+      },
+      { rootMargin: '200px 0px', threshold: 0.01 }
+    )
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <video
+      ref={videoRef}
+      muted
+      loop
+      playsInline
+      preload="none"
+      poster={poster || undefined}
+      src={src}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        objectPosition: 'center',
+        display: 'block',
+        background: '#3d2c2a',
+      }}
+    >
+      Your browser does not support video playback.
+    </video>
   )
 }

@@ -140,6 +140,8 @@ function ProductImage({ product }) {
         <img
           src={product.img}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       ) : (
