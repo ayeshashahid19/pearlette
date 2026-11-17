@@ -244,9 +244,8 @@ export default function CustomPage() {
                 lineHeight: "1.8",
               }}
             >
-              A 50% advance payment will be confirmed with you directly before
-              crafting begins. The remaining balance can be paid via Cash on
-              Delivery.
+              A 100% advance payment will be confirmed with you directly before
+              crafting begins. Full payment is required before crafting begins.
             </p>
             <button
               onClick={() => (window.location.href = "/")}
@@ -321,9 +320,9 @@ export default function CustomPage() {
               <li>✧ Upload inspiration photos (optional)</li>
               <li>✧ We will review and reach out within 24 hours</li>
               <li>✧ We will discuss design, materials, and pricing</li>
-              <li>✧ 50% advance payment required to start crafting</li>
+              <li>✧ 100% advance payment required to start crafting</li>
               <li>✧ We will handcraft your unique piece</li>
-              <li>✧ Delivery with Cash on Delivery for remaining amount</li>
+              <li>✧ Delivery of your finished piece</li>
             </ul>
           </div>
 
@@ -355,8 +354,8 @@ export default function CustomPage() {
                 textAlign: "center",
               }}
             >
-              50% advance payment required before crafting. Remaining 50% via
-              Cash on Delivery.
+              100% advance payment required before crafting. Full payment is
+              required before crafting begins.
             </p>
           </div>
 
@@ -493,9 +492,9 @@ export default function CustomPage() {
                 <li>✧ Upload inspiration photos (optional)</li>
                 <li>✧ We will review and reach out within 24 hours</li>
                 <li>✧ We will discuss design, materials, and pricing</li>
-                <li>✧ 50% advance payment required to start crafting</li>
+                <li>✧ 100% advance payment required to start crafting</li>
                 <li>✧ We will handcraft your unique piece</li>
-                <li>✧ Delivery with Cash on Delivery for remaining amount</li>
+                <li>✧ Delivery of your finished piece</li>
               </ul>
             </div>
 
@@ -526,9 +525,9 @@ export default function CustomPage() {
                   lineHeight: "1.8",
                 }}
               >
-                For custom orders, we require a 50% advance payment before
-                starting the crafting process. The remaining 50% can be paid via
-                Cash on Delivery when you receive your finished piece.
+                For custom orders, we require a 100% advance payment before
+                starting the crafting process. Full payment is required before
+                crafting begins.
               </p>
             </div>
 
@@ -1049,9 +1048,9 @@ export default function CustomPage() {
                     margin: 0,
                   }}
                 >
-                  <strong>Note:</strong> For custom orders, a 50% advance
-                  payment is required before we start crafting your piece. The
-                  remaining 50% can be paid via Cash on Delivery upon delivery.
+                  <strong>Note:</strong> For custom orders, a 100% advance
+                  payment is required before we start crafting your piece. Full
+                  payment is required before crafting begins.
                 </p>
               </div>
 

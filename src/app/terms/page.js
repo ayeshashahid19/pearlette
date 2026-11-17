@@ -14,7 +14,7 @@ export default function TermsPage() {
       ])}
       {policySection("Payment", [
         "Standard orders are payable in full via Cash on Delivery at the time of delivery.",
-        "Custom pieces require a 50% advance payment before crafting begins; the remaining 50% is payable via Cash on Delivery. The advance payment process will be confirmed with you directly by our team.",
+        "Custom pieces require a 100% advance payment before crafting begins. Full payment is required before crafting begins. The advance payment process will be confirmed with you directly by our team.",
       ])}
       {policySection("Custom Orders", [
         "Custom pieces typically take 3-5 days. Because each piece is handmade specifically for you, custom orders cannot be cancelled once crafting has started.",

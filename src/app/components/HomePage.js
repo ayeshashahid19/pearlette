@@ -291,7 +291,7 @@ export default function HomePage({ featuredProducts = [], brandVideoUrl = null, 
               }}
             >
               Have a unique vision? Share your inspiration and we will bring it to life. Custom pieces
-              typically take 3-5 days with a 50% advance to begin crafting.
+              typically take 3-5 days with a 100% advance to begin crafting.
             </p>
             <Link
               href="/custom"
